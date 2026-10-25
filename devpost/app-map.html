@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Chat Context Flow — App Map</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      line-height: 1.55;
+      --surface: Canvas;
+      --text: CanvasText;
+      --muted: color-mix(in srgb, CanvasText 72%, Canvas);
+      --border: color-mix(in srgb, CanvasText 22%, Canvas);
+      --accent: #5266c5;
+      --code: color-mix(in srgb, CanvasText 7%, Canvas);
+    }
+    body {
+      box-sizing: border-box;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px;
+      color: var(--text);
+      background: var(--surface);
+    }
+    a { color: var(--accent); }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .lede, .muted { color: var(--muted); }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .step, .note {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .step { border-top: 4px solid var(--accent); }
+    .step h3 { margin: 0 0 8px; }
+    .step p { margin: 0; }
+    code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: var(--code);
+      overflow-wrap: anywhere;
+    }
+    li + li { margin-top: 8px; }
+    @media (max-width: 650px) {
+      body { padding: 16px; }
+      .flow { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AI Chat Context Flow</h1>
+    <p class="lede">A Gemini-only Chrome extension that asks the current conversation for a structured context handoff, then places the result in a fresh chat for you to review.</p>
+    <p>The extension does not send the continuation draft. The source chat receives the extraction request and Gemini's response; the destination prompt stays editable until you send it yourself.</p>
+  </header>
+
+  <main>
+    <h2>One handoff, from click to draft</h2>
+    <div class="flow" aria-label="Handoff flow diagram">
+      <section class="step">
+        <h3>1. Start in a source chat</h3>
+        <p>Click <strong>Continue this conversation in new chat</strong>. <a href="../content/content-script.js">content/content-script.js</a> starts the request.</p>
+      </section>
+      <section class="step">
+        <h3>2. Generate and carry context</h3>
+        <p><a href="../background/service-worker.js">background/service-worker.js</a> coordinates Gemini and stores a one-time transfer while the new tab opens.</p>
+      </section>
+      <section class="step">
+        <h3>3. Review before sending</h3>
+        <p><a href="../content/gemini-dom.js">content/gemini-dom.js</a> inserts the snapshot as editable prompt text. You decide whether and when to send.</p>
+      </section>
+    </div>
+
+    <h2>Reference route through the code</h2>
+    <p>This is a navigation guide, not a claim that we toured these files together.</p>
+    <ol>
+      <li><a href="../content/content-script.js"><code>content/content-script.js</code></a> — find <code>handleFlowContext</code> to see the button send <code>FLOW_CURRENT_CHAT</code>, and <code>tryInsertPendingContext</code> to see the destination receive the draft.</li>
+      <li><a href="../background/service-worker.js"><code>background/service-worker.js</code></a> — find <code>handleFlowCurrentChat</code> for current-tab extraction, fresh-tab creation, and the temporary <code>pendingContext</code> transfer.</li>
+      <li><a href="../content/snapshot.js"><code>content/snapshot.js</code></a> — find <code>buildExtractionPrompt</code> and <code>extractSnapshot</code> for the agreed snapshot headings and response validation. Their behavior is covered by <a href="../tests/snapshot.test.js"><code>tests/snapshot.test.js</code></a>.</li>
+    </ol>
+
+    <h2>To change this, start here</h2>
+    <ul>
+      <li>Button wording and click behavior: <code>content/content-script.js</code>, <code>mountPageControls</code>.</li>
+      <li>Snapshot structure and required sections: <code>content/snapshot.js</code>, <code>buildExtractionPrompt</code> and <code>extractSnapshot</code>.</li>
+      <li>Gemini editor/send/response selectors and safe insertion: <code>content/gemini-dom.js</code>.</li>
+      <li>Button appearance, focus ring, and light/dark colors: <code>content/styles.css</code>.</li>
+    </ul>
+
+    <aside class="note">
+      <h2>A practice to reuse</h2>
+      <p>The handoff requirement keeps review and sending under the user's control. The prompt/response tests in <code>tests/snapshot.test.js</code> check the required structure, missing headings, and rendered-heading normalization. On another project, turn an important requirement into an observable result, then test that exact result instead of relying only on an implementation check.</p>
+    </aside>
+
+    <h2>Run it again</h2>
+    <ol>
+      <li>Run <code>node --test</code> from the project root to run the built-in tests.</li>
+      <li>In Chrome, open <code>chrome://extensions</code>, enable Developer mode, choose <strong>Load unpacked</strong>, and select the folder containing <code>manifest.json</code>.</li>
+      <li>Open an existing Gemini conversation, refresh the page, and try the handoff button. Inspect the new prompt before choosing to send it.</li>
+    </ol>
+    <p class="muted">Map snapshot: source commit <code>72716a1</code>. This file is a static offline guide and may drift as the code changes.</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,78 @@
+.context-flow-button {
+  display: block;
+  margin: 0 0 8px auto;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 20px;
+  color: #30343b;
+  background: #e8eaf2;
+  font: 500 13px/1.3 Arial, sans-serif;
+  cursor: pointer;
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.context-flow-open-chat-button {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  z-index: 1;
+  width: var(--context-flow-button-width);
+  max-width: none;
+  margin: 0;
+  padding: 7px 12px;
+  line-height: 1.2;
+  white-space: normal;
+  transform: translateY(-50%);
+}
+
+.context-flow-input-area {
+  position: relative;
+  --context-flow-button-width: clamp(88px, calc(100vw - 240px), 180px);
+}
+
+.context-flow-input-area > .context-flow-reserved-fieldset {
+  box-sizing: border-box;
+  width: calc(100% - var(--context-flow-button-width) - 8px);
+  min-width: 0;
+}
+
+.context-flow-button:hover {
+  background: #dce0eb;
+  box-shadow: 0 1px 3px #0002;
+}
+
+.context-flow-button:focus-visible {
+  outline: 2px solid #5266c5;
+  outline-offset: 2px;
+}
+
+.context-flow-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.context-flow-toast {
+  position: fixed;
+  z-index: 2147483647;
+  right: 24px;
+  bottom: 24px;
+  max-width: min(420px, calc(100vw - 48px));
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: #332600;
+  background: #ffedbd;
+  box-shadow: 0 4px 16px #0003;
+  font: 14px/1.45 Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  .context-flow-button {
+    color: #e4e6f1;
+    background: #343640;
+  }
+
+  .context-flow-button:hover {
+    background: #454752;
+  }
+
+}
