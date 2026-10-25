@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "AI Chat Context Flow",
+  "version": "0.1.0",
+  "description": "Carry context from a Gemini conversation into a fresh chat.",
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://gemini.google.com/*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://gemini.google.com/*"
+      ],
+      "js": [
+        "content/gemini-dom.js",
+        "content/snapshot.js",
+        "content/context-ui.js",
+        "content/content-script.js"
+      ],
+      "css": [
+        "content/styles.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
